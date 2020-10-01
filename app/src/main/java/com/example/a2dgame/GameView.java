@@ -76,12 +76,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
     public void update(){
         background.update();
+        characterSprite.update();
+        obstacle.update();
+        ground.update();
         if(characterSprite.isColliding()){
             System.out.println("u hit");
-        surfaceDestroyed(getHolder());}
+        surfaceDestroyed(getHolder());
+            }
 
-        characterSprite.update();
-      //  obstacle.update();
+
 
     //  else
         //  System.out.println("No hit");
@@ -103,6 +106,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             characterSprite.draw(canvas);
             drawUPS(canvas);
             drawFPS(canvas);
+            drawScore(canvas);
 
         }
     }
@@ -121,6 +125,14 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         paint.setColor(color);
         paint.setTextSize(40);
         canvas.drawText("FPS: " + averageUPS, 100,100,paint);
+    }
+    public void drawScore(Canvas canvas){
+        String score = Integer.toString(characterSprite.getScore());
+        Paint paint = new Paint();
+        int color = ContextCompat.getColor(getContext(),R.color.colorAccent);
+        paint.setColor(color);
+        paint.setTextSize(40);
+        canvas.drawText("Score:: " + score, 300,300,paint);
     }
 
 
