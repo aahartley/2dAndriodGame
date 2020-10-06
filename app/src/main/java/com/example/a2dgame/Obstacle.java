@@ -12,12 +12,13 @@ public class Obstacle {
     private int height=85;
     private int screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
     private int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
+    private int vY = 5;
 
 
     public Obstacle(Bitmap bMap){
         ob = bMap;
         x= screenWidth/2-500;
-        this.y =screenHeight/2-700;
+        y =screenHeight/2-700;
 
     }
     public void draw(Canvas canvas){
@@ -29,15 +30,21 @@ public class Obstacle {
         }
 
     }
-   /* public void update(){
-        setVector(-5);
+    public void update(){
+       /* setVector(-5);
         x+=dx;
         if(x<-GameView.WIDTH){
-            x=0;
+            x=0;*/
+       setY(y+=vY);
+       if(y>=600)
+           y= 0;
+
         }
 
+    public void setY(int y){
+        Obstacle.y =y;
     }
-*/    public static int getY(){
+    public static int getY(){
         return y;
     }
     public static int getX(){
