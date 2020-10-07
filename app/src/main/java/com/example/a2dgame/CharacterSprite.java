@@ -15,6 +15,7 @@ public class CharacterSprite {
     private int yVelocity = 28; //28
     private int xx,yy;
     private int score =0;
+    private int highScore= 0;
 
 
 
@@ -35,8 +36,12 @@ public class CharacterSprite {
     }
     /*(y-200)>= 1550 ||*/
    public boolean isColliding(){
-        if((y-200)>=Ground.getY()-250 || (y-200)<= Obstacle.getY()+250) //getY - whatever = 1550 then make them move y-200 <= getY+195
+        if((y-200)>=Ground.getY()-250 || (y-200)<= Obstacle.getY()+150) {
+            //getY - whatever = 1550 then make them move y-200 <= getY+195
+            highScore =score;
+            score =0;
             return true;
+        }
         else{
             System.out.println(Obstacle.getX()+" "+Obstacle.getY());
            System.out.println("char " +x+" "+y);
@@ -70,6 +75,9 @@ public class CharacterSprite {
     }
     public int getScore(){
        return score;
+    }
+    public int getHighScore(){
+       return highScore;
     }
 
     public void update(){

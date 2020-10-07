@@ -21,6 +21,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     public static final int WIDTH =2500;
     public static final int Height =3000;
 
+    boolean drawn = true;
 
 
     public GameView(Context context){
@@ -36,6 +37,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         switch(event.getAction()){
             case MotionEvent.ACTION_DOWN:
                 characterSprite.jump();
+                if(!drawn) {
+                  drawn=true;
+                }
                 return true;
         }
         return super.onTouchEvent(event);
@@ -62,10 +66,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         boolean retry = true;
+        thread.setRunning(false);
         while(retry){
             try{
-                thread.setRunning(false);
-                thread.join();
+               thread.join(10);
             }catch(Exception e){
                 e.printStackTrace();
             }
@@ -75,30 +79,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void update(){
+
+
         background.update();
         characterSprite.update();
         obstacle.update();
         ground.update();
-        if(characterSprite.isColliding()){
-            System.out.println("u hit");
-        surfaceDestroyed(getHolder());
-            }
-
-
-
-    //  else
-        //  System.out.println("No hit");
 
     }
 
     @Override
     public void draw(Canvas canvas) {
         super.draw(canvas);
-        final float scaleFactorX = ((float)getWidth()/WIDTH);
-        final float scaleFactorY =(float) getHeight()/Height;
-        if(canvas != null){
+        final float scaleFactorX = ((float) getWidth() / WIDTH);
+        final float scaleFactorY = (float) getHeight() / Height;
+        if (canvas != null) {
             final int savedState = canvas.save();
-            canvas.scale(scaleFactorX,scaleFactorY);
+            canvas.scale(scaleFactorX, scaleFactorY);
             background.draw(canvas);
             canvas.restoreToCount(savedState);
             ground.draw(canvas);
@@ -107,6 +104,17 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             drawUPS(canvas);
             drawFPS(canvas);
             drawScore(canvas);
+            drawHighScore(canvas);
+            if (characterSprite.isColliding()) {
+                drawOver(canvas);
+                drawn = false;
+                System.out.println("u hit");
+              /*  try {
+                    thread.join(10);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }*/
+            }
 
         }
     }
@@ -134,8 +142,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         paint.setTextSize(40);
         canvas.drawText("Score:: " + score, 300,300,paint);
     }
-
-
+    public void drawHighScore(Canvas canvas){
+        String score = Integer.toString(characterSprite.getHighScore());
+        Paint paint = new Paint();
+        int color = ContextCompat.getColor(getContext(),R.color.colorAccent);
+        paint.setColor(color);
+        paint.setTextSize(40);
+        canvas.drawText("Score:: " + score, 400,400,paint);
+    }
+    public void drawOver(Canvas canvas){
+        String over ="Game Over";
+        Paint paint = new Paint();
+        int color = ContextCompat.getColor(getContext(),R.color.red);
+        paint.setColor(color);
+        paint.setTextSize(200);
+        canvas.drawText(over,20,1000,paint);
+    }
 
 
 }
