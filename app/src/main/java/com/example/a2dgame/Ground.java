@@ -25,6 +25,9 @@ public class Ground {
 
 
     public void update(){
+        if(!GameView.drawn){
+            y=2000;
+        }
         setY(y-=vY);
         System.out.println(getY());
         if(y== 1400)
