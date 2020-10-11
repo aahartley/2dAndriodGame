@@ -31,6 +31,10 @@ public class Obstacle {
 
     }
     public void update(){
+        if(!GameView.drawn){
+            y =screenHeight/2-700;
+
+        }
        /* setVector(-5);
         x+=dx;
         if(x<-GameView.WIDTH){

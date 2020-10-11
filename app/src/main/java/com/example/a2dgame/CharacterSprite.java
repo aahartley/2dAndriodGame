@@ -1,5 +1,6 @@
 package com.example.a2dgame;
 
+
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -8,6 +9,7 @@ import android.graphics.Canvas;
 public class CharacterSprite {
     private Bitmap image;
     private Bitmap[] images = new Bitmap[6];
+    private GameView gV;
     private int width =90;
     private int height=85;
     private int currentFrame=0;
@@ -15,7 +17,7 @@ public class CharacterSprite {
     private int yVelocity = 28; //28
     private int xx,yy;
     private int score =0;
-    private int highScore= 0;
+    private int highScore;
 
 
 
@@ -38,7 +40,7 @@ public class CharacterSprite {
    public boolean isColliding(){
         if((y-200)>=Ground.getY()-250 || (y-200)<= Obstacle.getY()+150) {
             //getY - whatever = 1550 then make them move y-200 <= getY+195
-            highScore =score;
+            setScore(score);
             score =0;
             return true;
         }
@@ -73,6 +75,13 @@ public class CharacterSprite {
         y-=350;   //450
         score++;
     }
+    public void setScore(int score){
+       if(highScore >= score) {
+           highScore = highScore;
+       }
+       else
+           highScore=score;
+    }
     public int getScore(){
        return score;
     }
@@ -81,10 +90,16 @@ public class CharacterSprite {
     }
 
     public void update(){
-        y += yVelocity;
-        if(y>screenHeight) y=0;
-        else if(y<0) y=screenHeight-100;
-        if(isColliding()) System.out.println("DEAD");
+        if(!GameView.drawn) {
+            System.out.println("DEAD");
+            y = screenHeight/2+100;
+            return;
+        }
+            y += yVelocity;
+            if (y > screenHeight) y = 0;
+            else if (y < 0) y = screenHeight - 100;
+
+
 
 
 
