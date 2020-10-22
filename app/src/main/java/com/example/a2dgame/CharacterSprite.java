@@ -1,9 +1,11 @@
 package com.example.a2dgame;
 
 
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.preference.PreferenceManager;
 
 
 public class CharacterSprite {
@@ -18,18 +20,24 @@ public class CharacterSprite {
     private int xx,yy;
     private int score =0;
     private int highScore;
+    private String saved;
+    private int lastScore;
 
 
 
     private int screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
     private int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
-    public CharacterSprite(Bitmap bmap){
+    public CharacterSprite(Bitmap bmap, String highs){
         image= bmap;
         x = (screenWidth/2)-200;
         y = screenHeight/2+100;
         for(int i=0; i<images.length-1;i++){
             images[i] = Bitmap.createBitmap(image,i*width,0,width,height);
         }
+        if(highs.equals(""))
+            saved ="0";
+        else
+        saved = highs;
        // System.out.println(screenHeight);
 
 
@@ -41,6 +49,7 @@ public class CharacterSprite {
         if((y-200)>=Ground.getY()-250 || (y-200)<= Obstacle.getY()+150) {
             //getY - whatever = 1550 then make them move y-200 <= getY+195
             setScore(score);
+            lastScore = score;
             score =0;
             return true;
         }
@@ -76,14 +85,17 @@ public class CharacterSprite {
         score++;
     }
     public void setScore(int score){
-       if(highScore >= score) {
-           highScore = highScore;
+       if(highScore <score && score > Integer.parseInt(saved) /*&& Integer.parseInt(saved)!=0*/) {
+           highScore = score;
        }
        else
-           highScore=score;
+           highScore=highScore;
     }
     public int getScore(){
        return score;
+    }
+    public int getLastScore(){
+       return lastScore;
     }
     public int getHighScore(){
        return highScore;
@@ -98,13 +110,6 @@ public class CharacterSprite {
             y += yVelocity;
             if (y > screenHeight) y = 0;
             else if (y < 0) y = screenHeight - 100;
-
-
-
-
-
-
-
     }
 
 
