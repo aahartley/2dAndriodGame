@@ -31,6 +31,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 
     public static boolean drawn = true;
+    public boolean start = false;
     public boolean retry = false;
     Rect rec = new Rect(10,250,500,500);
 
@@ -51,6 +52,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 float x = event.getX();
                 float y= event.getY();
                 System.out.println("touch:"+x+" "+y);
+                if(!start){
+                    start = true;
+                }
                 if(y <= (Height/2)-800){
                     retry=true;
                 }
@@ -74,9 +78,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         ground = new Ground(BitmapFactory.decodeResource(getResources(),R.drawable.owl_horizontal));
         obstacle = new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.owl_horizontal));
 
+        if(thread.getState().equals(Thread.State.TERMINATED)){
+            SurfaceHolder surfaceHolder = getHolder();
+            surfaceHolder.addCallback(this);
+            thread = new MainThread(surfaceHolder, this);
+        }
 
         thread.setRunning(true);
         thread.start();
+
     }
 
 
@@ -89,25 +99,28 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         boolean retry = true;
+        thread.setRunning(false);
         while(retry){
             try{
-                thread.setRunning(false);
-               thread.join();
+                thread.join();
+                retry = false;
+                System.out.println(thread.getState());
+
             }catch(Exception e){
                 e.printStackTrace();
             }
-            retry = false;
         }
 
     }
 
     public void update(){
 
-
-        background.update();
-        characterSprite.update();
-        obstacle.update();
-        ground.update();
+        if(start) {
+            background.update();
+            characterSprite.update();
+            obstacle.update();
+            ground.update();
+        }
 
     }
 
@@ -122,6 +135,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 canvas.scale(scaleFactorX, scaleFactorY);
                 background.draw(canvas);
                 canvas.restoreToCount(savedState);
+                if(!start){
+                    drawWelcome(canvas);
+                }
                 if (characterSprite.isColliding()) {
                     drawn = false;
 
@@ -131,9 +147,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                     //  drawRetry(canvas);
                     drawHighScore(canvas);
                      drawLastScore(canvas);
+                     drawInstr(canvas);
                     System.out.println("u hit");
                 }
-                if (drawn) {
+                if (drawn && start) {
                     ground.draw(canvas);
                     obstacle.draw(canvas);
                     characterSprite.draw(canvas);
@@ -153,6 +170,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 
         }
+
 
     public void drawUPS(Canvas canvas){
         String averageUPS = Double.toString(thread.getAverageUPS());
@@ -228,6 +246,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         paint.setColor(color);
         canvas.drawRect(rec,paint);
 
+    }
+
+    public void drawWelcome(Canvas canvas){
+        String over ="Tap to Start";
+        Paint paint = new Paint();
+        int color = ContextCompat.getColor(getContext(),R.color.red);
+        paint.setColor(color);
+        paint.setTextSize(200);
+        canvas.drawText(over,20,1000,paint);
+    }
+    public void drawInstr(Canvas canvas){
+        String score = "tap above game over to start";
+        Paint paint = new Paint();
+        int color = ContextCompat.getColor(getContext(),R.color.colorAccent);
+        paint.setColor(color);
+        paint.setTextSize(40);
+        canvas.drawText(score, 350,350,paint);
     }
 
 
