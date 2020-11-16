@@ -2,6 +2,7 @@ package com.example.a2dgame;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 
@@ -22,6 +23,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     private  Ground ground;
     public static final int WIDTH =2500;
     public static final int Height =3000;
+    private int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
+    private int screenWidth = Resources.getSystem().getDisplayMetrics().widthPixels;
     SharedPreferences sharedPref = getContext().getSharedPreferences("highscores",Context.MODE_PRIVATE);
     SharedPreferences.Editor editor = sharedPref.edit();
     public String highScore = sharedPref.getString("highscore","");
@@ -31,8 +34,9 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 
     public static boolean drawn = true;
+    public boolean start = false;
     public boolean retry = false;
-    Rect rec = new Rect(10,250,500,500);
+    Rect rec = new Rect(400,screenHeight-500,700,screenHeight-200);
 
 
 
@@ -51,7 +55,10 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 float x = event.getX();
                 float y= event.getY();
                 System.out.println("touch:"+x+" "+y);
-                if(y <= (Height/2)-800){
+                if(!start){
+                    start = true;
+                }
+               if(x>400 && x <700 && y>screenHeight-500 && y<screenHeight-200){
                     retry=true;
                 }
 
@@ -74,9 +81,15 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         ground = new Ground(BitmapFactory.decodeResource(getResources(),R.drawable.owl_horizontal));
         obstacle = new Obstacle(BitmapFactory.decodeResource(getResources(),R.drawable.owl_horizontal));
 
+        if(thread.getState().equals(Thread.State.TERMINATED)){
+            SurfaceHolder surfaceHolder = getHolder();
+            surfaceHolder.addCallback(this);
+            thread = new MainThread(surfaceHolder, this);
+        }
 
         thread.setRunning(true);
         thread.start();
+
     }
 
 
@@ -89,25 +102,28 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
     @Override
     public void surfaceDestroyed(SurfaceHolder holder) {
         boolean retry = true;
+        thread.setRunning(false);
         while(retry){
             try{
-                thread.setRunning(false);
-               thread.join();
+                thread.join();
+                retry = false;
+                System.out.println(thread.getState());
+
             }catch(Exception e){
                 e.printStackTrace();
             }
-            retry = false;
         }
 
     }
 
     public void update(){
 
-
-        background.update();
-        characterSprite.update();
-        obstacle.update();
-        ground.update();
+        if(start) {
+            background.update();
+            characterSprite.update();
+            obstacle.update();
+            ground.update();
+        }
 
     }
 
@@ -122,18 +138,22 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
                 canvas.scale(scaleFactorX, scaleFactorY);
                 background.draw(canvas);
                 canvas.restoreToCount(savedState);
+                if(!start){
+                    drawWelcome(canvas);
+                }
                 if (characterSprite.isColliding()) {
                     drawn = false;
 
                 }
                 if (!drawn) {
                     drawOver(canvas);
-                    //  drawRetry(canvas);
+                      drawRetry(canvas);
                     drawHighScore(canvas);
                      drawLastScore(canvas);
+                     drawInstr(canvas);
                     System.out.println("u hit");
                 }
-                if (drawn) {
+                if (drawn && start) {
                     ground.draw(canvas);
                     obstacle.draw(canvas);
                     characterSprite.draw(canvas);
@@ -153,6 +173,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
 
 
         }
+
 
     public void drawUPS(Canvas canvas){
         String averageUPS = Double.toString(thread.getAverageUPS());
@@ -175,16 +196,16 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         Paint paint = new Paint();
         int color = ContextCompat.getColor(getContext(),R.color.colorAccent);
         paint.setColor(color);
-        paint.setTextSize(40);
-        canvas.drawText("Score:: " + score, 300,300,paint);
+        paint.setTextSize(60);
+        canvas.drawText("Score:: " + score, screenWidth/2-160,400,paint);
     }
     public void drawLastScore(Canvas canvas){
         String score = Integer.toString(characterSprite.getLastScore());
         Paint paint = new Paint();
         int color = ContextCompat.getColor(getContext(),R.color.colorAccent);
         paint.setColor(color);
-        paint.setTextSize(40);
-        canvas.drawText("Score:: " + score, 300,300,paint);
+        paint.setTextSize(60);
+        canvas.drawText("Score:: " + score, screenWidth/2-160,400,paint);
     }
     public void drawHighScore(Canvas canvas){
         if(characterSprite.getHighScore()==0) {
@@ -207,8 +228,8 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
             Paint paint = new Paint();
             int color = ContextCompat.getColor(getContext(), R.color.colorAccent);
             paint.setColor(color);
-            paint.setTextSize(40);
-            canvas.drawText("HighScore: " + score, 400, 400, paint);
+            paint.setTextSize(60);
+            canvas.drawText("HighScore: " + score, screenWidth/2-160, 300, paint);
 
 
 
@@ -220,7 +241,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         int color = ContextCompat.getColor(getContext(),R.color.red);
         paint.setColor(color);
         paint.setTextSize(200);
-        canvas.drawText(over,20,1000,paint);
+        canvas.drawText(over,25,1000,paint);
     }
     public void drawRetry(Canvas canvas){
         Paint paint = new Paint();
@@ -228,6 +249,23 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         paint.setColor(color);
         canvas.drawRect(rec,paint);
 
+    }
+
+    public void drawWelcome(Canvas canvas){
+        String over ="Tap to Start";
+        Paint paint = new Paint();
+        int color = ContextCompat.getColor(getContext(),R.color.red);
+        paint.setColor(color);
+        paint.setTextSize(200);
+        canvas.drawText(over,24,1000,paint);
+    }
+    public void drawInstr(Canvas canvas){
+        String score = "tap to restart";
+        Paint paint = new Paint();
+        int color = ContextCompat.getColor(getContext(),R.color.colorAccent);
+        paint.setColor(color);
+        paint.setTextSize(40);
+        canvas.drawText(score, 435,screenHeight-350,paint);
     }
 
 
