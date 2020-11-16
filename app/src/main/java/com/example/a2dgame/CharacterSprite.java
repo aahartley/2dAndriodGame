@@ -1,11 +1,9 @@
 package com.example.a2dgame;
 
 
-import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.preference.PreferenceManager;
 
 
 public class CharacterSprite {
@@ -16,7 +14,7 @@ public class CharacterSprite {
     private int height=85;
     private int currentFrame=0;
     private double x,y;
-    private int yVelocity = 28; //28
+    private int yVelocity = 28;
     private int xx,yy;
     private int score =0;
     private int highScore;
@@ -29,7 +27,7 @@ public class CharacterSprite {
     private int screenHeight = Resources.getSystem().getDisplayMetrics().heightPixels;
     public CharacterSprite(Bitmap bmap, String highs){
         image= bmap;
-        x = (screenWidth/2)-200;
+        x = (screenWidth/2)-75;
         y = screenHeight/2+100;
         for(int i=0; i<images.length-1;i++){
             images[i] = Bitmap.createBitmap(image,i*width,0,width,height);
