@@ -30,7 +30,13 @@ public class CharacterSprite {
         x = (screenWidth/2)-75;
         y = screenHeight/2+100;
         for(int i=0; i<images.length-1;i++){
+            if(height > image.getHeight() ) {
+                height = image.getHeight();
+                width-=5;
+            }
+
             images[i] = Bitmap.createBitmap(image,i*width,0,width,height);
+            System.out.println("HEIGHT IS: "+image.getHeight());
         }
         if(highs.equals(""))
             saved ="0";
