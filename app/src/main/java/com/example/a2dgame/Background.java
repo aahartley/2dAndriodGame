@@ -8,6 +8,7 @@ public class Background {
     private int x,y,dx;
 
 
+
     public Background(Bitmap bMap){
         bg = bMap;
 

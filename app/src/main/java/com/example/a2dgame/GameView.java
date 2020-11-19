@@ -197,7 +197,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         int color = ContextCompat.getColor(getContext(),R.color.colorAccent);
         paint.setColor(color);
         paint.setTextSize(60);
-        canvas.drawText("Score:: " + score, screenWidth/2-160,400,paint);
+        canvas.drawText("Score: " + score, screenWidth/2-160,400,paint);
     }
     public void drawLastScore(Canvas canvas){
         String score = Integer.toString(characterSprite.getLastScore());
@@ -205,7 +205,7 @@ public class GameView extends SurfaceView implements SurfaceHolder.Callback {
         int color = ContextCompat.getColor(getContext(),R.color.colorAccent);
         paint.setColor(color);
         paint.setTextSize(60);
-        canvas.drawText("Score:: " + score, screenWidth/2-160,400,paint);
+        canvas.drawText("Score: " + score, screenWidth/2-160,400,paint);
     }
     public void drawHighScore(Canvas canvas){
         if(characterSprite.getHighScore()==0) {

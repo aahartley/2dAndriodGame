@@ -15,7 +15,7 @@ public class Ground {
         gr = bMap;
         x=screenWidth/2-500;
        // this.y= screenHeight/2+700;
-        y=2000;
+        y=screenHeight-100;
     }
     public void draw(Canvas canvas){
         canvas.drawBitmap(gr,x,y,null);
@@ -26,12 +26,12 @@ public class Ground {
 
     public void update(){
         if(!GameView.drawn){
-            y=2000;
+            y=screenHeight-100;
         }
         setY(y-=vY);
         System.out.println(getY());
         if(y== 1400)
-            setY(2000);
+            setY(screenHeight-100);
         }
         public void setY(int y){
         Ground.y =y;
